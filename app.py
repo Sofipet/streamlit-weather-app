@@ -5,16 +5,16 @@ import pydeck as pdk
 
 
 
-# 1. Налаштування сторінки
+# 1. Page settings
 
 st.set_page_config(
-    page_title="Прогноз погоди в Австралії",
+    page_title="Australian Weather Forecast",
     page_icon="☀️",
     layout="centered"
 )
 
 
-# 2. Завантаження моделі
+# 2. Load model
 
 @st.cache_resource
 def load_model():
@@ -30,18 +30,15 @@ numeric_cols = data["numeric_cols"]
 categorical_cols = data["categorical_cols"]
 
 
-# 3. Функція динамічного фону
+# 3. Dynamic background function
 
 def set_dynamic_background(state="default"):
 
     if state == "sunny":
-       
         bg_url = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
     elif state == "rainy":
-        
         bg_url = "https://images.unsplash.com/photo-1635848499642-ae0fa19d6c3e?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cmFpbiUyMG9uJTIwd2luZG93fGVufDB8fDB8fHww&ixlib=rb-4.1.0&q=80&w=2000"
     else:
-        
         bg_url = "https://images.unsplash.com/photo-1672211989567-ffedea9cc234?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2574"
 
     st.markdown(f"""
@@ -50,7 +47,6 @@ def set_dynamic_background(state="default"):
         background: transparent !important;
     }}
 
-    /* Фон на всю сторінку */
     .stApp {{
         background:
             linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)),
@@ -58,9 +54,8 @@ def set_dynamic_background(state="default"):
         background-size: cover !important;
     }}
 
-    /* Тепер контейнер — класична біла коробка */
     .block-container {{
-        background: #ffffff; /* суцільно білий */
+        background: #ffffff;
         border-radius: 20px;
         padding: 2rem 3.5rem;
         box-shadow: 0 8px 25px rgba(0,0,0,0.12);
@@ -98,78 +93,78 @@ def set_dynamic_background(state="default"):
     """, unsafe_allow_html=True)
 
 
-# Ініціалізація стану фону
+# Initialize background state
 if "weather_state" not in st.session_state:
     st.session_state["weather_state"] = "default"
 
-# Встановити фон
+# Apply background
 set_dynamic_background(st.session_state["weather_state"])
 
 
-# 4. Заголовок
+# 4. Title
 
-st.markdown("<h1>🇦🇺 Прогноз погоди в Австралії</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Перевір, якою буде погода завтра — сонячно чи дощитиме</p>", unsafe_allow_html=True)
+st.markdown("<h1>🇦🇺 Australian Weather Forecast</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Check what the weather will be tomorrow — sunny or rainy</p>", unsafe_allow_html=True)
 st.divider()
 
 
-# 5. Ввід користувача
+# 5. User input
 
-st.markdown("### 📍 Oсновні показники")
+st.markdown("### 📍 Main indicators")
 
 col1, col2 = st.columns(2)
 with col1:
-    Location = st.selectbox("Місто", [
+    Location = st.selectbox("City", [
         "Adelaide", "Albany", "Albury", "AliceSprings",
         "Brisbane", "Canberra", "Darwin", "Hobart", "Melbourne", "Sydney"
     ])
 with col2:
-    Rainfall = st.slider("Опади сьогодні (мм)", 0.0, 100.0, 0.0)
+    Rainfall = st.slider("Rainfall today (mm)", 0.0, 100.0, 0.0)
 
 col1, col2 = st.columns(2)
 with col1:
-    MinTemp = st.slider("Мінімальна температура (°C)", -5.0, 35.0, 10.0)
+    MinTemp = st.slider("Minimum temperature (°C)", -5.0, 35.0, 10.0)
 with col2:
-    MaxTemp = st.slider("Максимальна температура (°C)", 0.0, 45.0, 25.0)
+    MaxTemp = st.slider("Maximum temperature (°C)", 0.0, 45.0, 25.0)
 
 col1, col2 = st.columns(2)
 with col1:
-    Sunshine = st.slider("Сонячні години", 0.0, 14.0, 7.0)
+    Sunshine = st.slider("Sunshine hours", 0.0, 14.0, 7.0)
 with col2:
-    Evaporation = st.slider("Випаровування (мм)", 0.0, 20.0, 5.0)
+    Evaporation = st.slider("Evaporation (mm)", 0.0, 20.0, 5.0)
 
 st.markdown("---")
-st.markdown("### 💨 Вітер і тиск")
+st.markdown("### 💨 Wind and pressure")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    WindGustDir = st.selectbox("Напрям пориву вітру", ["N","NE","E","SE","S","SW","W","NW"])
+    WindGustDir = st.selectbox("Wind gust direction", ["N","NE","E","SE","S","SW","W","NW"])
 with col2:
-    WindGustSpeed = st.slider("Швидкість пориву (км/год)", 0, 150, 35)
+    WindGustSpeed = st.slider("Gust speed (km/h)", 0, 150, 35)
 with col3:
-    RainToday = st.selectbox("Був дощ сьогодні?", ["Ні", "Так"])
+    RainToday = st.selectbox("Was there rain today?", ["No", "Yes"])
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    Pressure9am = st.slider("Тиск о 9:00 (hPa)", 980.0, 1040.0, 1015.0)
+    Pressure9am = st.slider("Pressure at 9am (hPa)", 980.0, 1040.0, 1015.0)
 with col2:
-    Pressure3pm = st.slider("Тиск о 15:00 (hPa)", 980.0, 1040.0, 1012.0)
+    Pressure3pm = st.slider("Pressure at 3pm (hPa)", 980.0, 1040.0, 1012.0)
 with col3:
-    WindSpeed3pm = st.slider("Середня швидкість вітру (км/год)", 0, 80, 15)
+    WindSpeed3pm = st.slider("Average wind speed (km/h)", 0, 80, 15)
 
 st.markdown("---")
-st.markdown("### 🌦️ Вологість та хмарність")
+st.markdown("### 🌦️ Humidity and cloudiness")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    Humidity9am = st.slider("Вологість о 9:00 (%)", 0, 100, 60)
+    Humidity9am = st.slider("Humidity at 9am (%)", 0, 100, 60)
 with col2:
-    Humidity3pm = st.slider("Вологість о 15:00 (%)", 0, 100, 55)
+    Humidity3pm = st.slider("Humidity at 3pm (%)", 0, 100, 55)
 with col3:
-    Cloud3pm = st.slider("Хмарність (0-9)", 0, 9, 4)
+    Cloud3pm = st.slider("Cloudiness (0–9)", 0, 9, 4)
 
 
-# 6. Дані для карти
+# 6. City coordinates for the map
 
 cities = pd.DataFrame({
     "city": ["Adelaide","Albany","Albury","AliceSprings","Brisbane","Canberra","Darwin","Hobart","Melbourne","Sydney"],
@@ -178,7 +173,7 @@ cities = pd.DataFrame({
 })
 
 
-# 7. Формування DataFrame
+# 7. Build input dataframe
 
 input_data = pd.DataFrame({
     "Location": [Location],
@@ -201,7 +196,7 @@ input_data = pd.DataFrame({
     "Cloud3pm": [Cloud3pm],
     "Temp9am": [15.0],
     "Temp3pm": [MaxTemp - 3],
-    "RainToday": ["Yes" if RainToday == "Так" else "No"]
+    "RainToday": ["Yes" if RainToday == "Yes" else "No"]
 })
 
 input_data[numeric_cols] = imputer.transform(input_data[numeric_cols])
@@ -212,14 +207,14 @@ encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(categor
 X_ready = pd.concat([scaled_df, encoded_df], axis=1)
 
 
-# 8. Прогноз
+# 8. Prediction
 
 st.markdown("---")
-if st.button("Переглянути прогноз на завтра", use_container_width=True):
+if st.button("Show forecast for tomorrow", use_container_width=True):
     prob = model.predict_proba(X_ready)[0][1]
     prediction = int(prob > 0.5)
 
-    # Динамічна зміна фону
+    # Dynamic background
     if prediction == 1:
         st.session_state["weather_state"] = "rainy"
     else:
@@ -227,18 +222,18 @@ if st.button("Переглянути прогноз на завтра", use_cont
 
     set_dynamic_background(st.session_state["weather_state"])
 
-    st.markdown("## Завтрашній прогноз:")
+    st.markdown("## Tomorrow's forecast:")
     if prediction == 1:
-        st.error(f"Ймовірність дощу завтра: **{prob:.1%}**")
-        st.markdown("Завтра можливий дощ — краще взяти парасольку.")
+        st.error(f"Chance of rain tomorrow: **{prob:.1%}**")
+        st.markdown("Rain is likely tomorrow — better take an umbrella.")
         st.image("https://cdn-icons-png.flaticon.com/512/4150/4150897.png", width=100)
     else:
-        st.success(f"Ймовірність дощу завтра: **{prob:.1%}**")
-        st.markdown("Очікується суха, приємна погода. Гарний день для відпочинку на природі.")
+        st.success(f"Chance of rain tomorrow: **{prob:.1%}**")
+        st.markdown("Dry, pleasant weather is expected. A great day to enjoy the outdoors!")
         st.image("https://cdn-icons-png.flaticon.com/512/869/869869.png", width=100)
 
 
-    # 9. Карта Австралії
+    # 9. Australia map
 
     selected_city = cities[cities["city"] == Location]
 
